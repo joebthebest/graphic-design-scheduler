@@ -423,7 +423,7 @@ def generate_pdf(filename):
 
     # ================= PAGE 1: COVER =================
     story.append(Spacer(1, 1.8 * inch))
-    story.append(Paragraph("SCHEDULEPRO — JAMES DESIGN STUDIO", title_style))
+    story.append(Paragraph("JAMES DESIGN STUDIO", title_style))
     story.append(Spacer(1, 12))
     story.append(Paragraph("A Personal Scheduling &amp; Portfolio Web Application for Graphic Design Businesses<br/>Built using Python and Django Framework", subtitle_style))
     story.append(Spacer(1, 2.2 * inch))
@@ -439,7 +439,7 @@ def generate_pdf(filename):
     # ================= PAGE 2: USER STORY =================
     story.append(Paragraph("1. User Story", h1_style))
     story.append(Paragraph(
-        "<b>James Design Studio (SchedulePro)</b> is a full-featured web application that enables a freelance graphic design studio "
+        "<b>James Design Studio</b> is a full-featured web application that enables a freelance graphic design studio "
         "to showcase creative works, automate client consultation bookings, calculate conflict-free real-time calendar slots, and manage "
         "production workflows online instead of through manual back-and-forth phone calls or unorganized messaging apps. "
         "The system supports three primary roles: a <b>Customer / Client</b> who browses portfolio designs and books design consultation sessions, "
@@ -598,7 +598,7 @@ def generate_pdf(filename):
     # ================= PAGE 7 & 8: CLASS DIAGRAM =================
     story.append(Paragraph("4. Class Diagram", h1_style))
     story.append(Paragraph(
-        "The diagram below depicts the data model architecture of James Design Studio (SchedulePro), illustrating model fields, "
+        "The diagram below depicts the data model architecture of James Design Studio, illustrating model fields, "
         "methods, and relationships spanning authentication, scheduling, portfolio presentation, and client reviews.",
         body_style
     ))
@@ -624,7 +624,7 @@ def generate_pdf(filename):
     # ================= PAGE 9: HOSTED LINK & DEPLOYMENT =================
     story.append(Paragraph("5. Hosted Link & Deployment Details", h1_style))
     story.append(Paragraph(
-        "James Design Studio (SchedulePro) is deployed to production using a modern serverless cloud architecture on <b>Vercel</b>, "
+        "James Design Studio is deployed to production using a modern serverless cloud architecture on <b>Vercel</b>, "
         "integrated with a continuous deployment pipeline tracking the <b>GitHub</b> repository.",
         body_style
     ))
