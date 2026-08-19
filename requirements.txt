@@ -3,3 +3,4 @@ pillow>=10.0
 asgiref>=3.8
 sqlparse>=0.5
 tzdata
+whitenoise>=6.6.0
