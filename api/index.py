@@ -6,9 +6,11 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'graphic_design_scheduler.settin
 _application = get_wsgi_application()
 
 def app(environ, start_response):
-    path = environ.get('PATH_INFO', '')
-    if path.startswith('/api/index.py'):
-        environ['PATH_INFO'] = path.replace('/api/index.py', '', 1) or '/'
-    elif path.startswith('/api/index'):
-        environ['PATH_INFO'] = path.replace('/api/index', '', 1) or '/'
+    for key in ['PATH_INFO', 'REQUEST_URI', 'RAW_URI']:
+        if key in environ and environ[key]:
+            for prefix in ['/api/index.py', 'api/index.py', '/api/index', 'api/index']:
+                if environ[key].startswith(prefix):
+                    cleaned = environ[key][len(prefix):]
+                    environ[key] = cleaned if cleaned.startswith('/') else ('/' + cleaned)
+                    break
     return _application(environ, start_response)
