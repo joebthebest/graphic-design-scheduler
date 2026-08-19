@@ -363,46 +363,36 @@ class Command(BaseCommand):
             )
 
         # 6. Add Reviews
+        Review.objects.all().delete()
         reviews_data = [
             {
-                'client_name': 'Dee Adebayo',
-                'client_role': 'Founder, NailedByDee Studio',
-                'service_name': 'Brand Identity & Logo Suite',
+                'client_name': 'Orji Bond',
+                'client_role': 'Campaign Organization',
+                'service_name': 'Campaign Publicity Suite',
                 'rating': 5,
-                'comment': 'James delivered beyond our expectations! The nude aesthetic and logo mark transformed our boutique into a luxury brand. Clients constantly compliment our branding. The booking and consultation session was seamless!',
+                'comment': 'Top-notch turn-around time. The billboard posters and digital campaign materials gave our candidate an undeniable presence across all media channels.',
                 'is_featured': True,
             },
             {
-                'client_name': 'Chef Tunde',
-                'client_role': 'Owner, The Backyard Grill',
-                'service_name': 'Event Flyer & Poster Design',
-                'rating': 5,
-                'comment': 'The Grill & Groove flyer had everyone talking! We sold out our event within 48 hours of posting. James’ attention to detail and color mastery is unmatched.',
-                'is_featured': True,
-            },
-            {
-                'client_name': 'Dr. Kemi Balogun',
-                'client_role': 'Research Lead, DAWN Health',
+                'client_name': 'DAWN',
+                'client_role': 'Healthcare Research',
                 'service_name': 'Infographics & Corporate Visuals',
                 'rating': 5,
                 'comment': 'Extremely professional and punctual. The infographic communicated dense epidemiological data in such an intuitive, beautiful format for our board presentation.',
                 'is_featured': True,
             },
             {
-                'client_name': 'Orji Campaign Director',
-                'client_role': 'Publicity Secretary',
-                'service_name': 'Campaign Publicity Suite',
+                'client_name': "Kala's Kitchen",
+                'client_role': 'The Backyard Grill',
+                'service_name': 'Event Flyer & Poster Design',
                 'rating': 5,
-                'comment': 'Top-notch turn-around time. The billboard posters and digital campaign materials gave our candidate an undeniable presence across all media channels.',
+                'comment': 'The Grill & Groove flyer had everyone talking! We sold out our event within 48 hours of posting. James’ attention to detail and color mastery is unmatched.',
                 'is_featured': True,
             }
         ]
 
         for r_data in reviews_data:
-            Review.objects.update_or_create(
-                client_name=r_data['client_name'],
-                defaults=r_data
-            )
+            Review.objects.create(**r_data)
 
         self.stdout.write(self.style.SUCCESS("[OK] Seeded realistic client appointments and reviews."))
         self.stdout.write(self.style.SUCCESS("[OK] Graphic Design Scheduling Database seeding completed successfully!"))
