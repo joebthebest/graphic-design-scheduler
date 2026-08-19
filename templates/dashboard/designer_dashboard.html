@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Studio Dashboard — {{ STUDIO_NAME }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <!-- Top Bar -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+    <div>
+      <span class="section-label">Studio Workspace</span>
+      <h1 style="font-size: 2.2rem; font-weight: 700;">Designer Management Dashboard</h1>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <a href="{% url 'working_hours_settings' %}" class="btn btn-secondary btn-sm">
+        <span>Working Hours</span>
+      </a>
+      <a href="{% url 'export_appointments_csv' %}" class="btn btn-outline btn-sm">
+        <span>Export CSV</span>
+      </a>
+      <a href="{% url 'book_wizard' %}" class="btn btn-primary btn-sm" target="_blank">
+        <span>New Booking</span>
+        <i data-lucide="arrow-up-right"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Metrics Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">[ Total Bookings ]</div>
+      <div class="kpi-val">{{ total_bookings }}</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">[ Confirmed Revenue ]</div>
+      <div class="kpi-val" style="color: var(--accent-primary);">₦{{ confirmed_revenue|floatformat:0|intcomma }}</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">[ Pending Review ]</div>
+      <div class="kpi-val">{{ pending_count }}</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">[ In Progress ]</div>
+      <div class="kpi-val">{{ in_progress_count }}</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">[ Completed ]</div>
+      <div class="kpi-val" style="color: var(--accent-green);">{{ completed_count }}</div>
+    </div>
+  </div>
+
+  <!-- Today's Schedule Alert if any -->
+  {% if today_sessions.exists %}
+    <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 2rem;">
+      <div style="font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; color: var(--accent-primary); font-weight: 700; margin-bottom: 0.75rem;">
+        Today's Scheduled Consultations ({{ today|date:"l, M j" }})
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem;">
+        {% for appt in today_sessions %}
+          <div style="background: var(--bg-surface); padding: 0.85rem 1rem; border-radius: var(--radius-xs); border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="font-size: 0.9rem; display: block;">{{ appt.start_time|time:"g:i A" }} — {{ appt.client_name }}</strong>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">{{ appt.service.name }}</span>
+            </div>
+            <a href="{{ appt.meeting_link }}" target="_blank" class="btn btn-primary btn-sm">Join</a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Filter Bar -->
+  <form method="GET" class="dashboard-filter-bar">
+    <div class="filter-group" style="flex: 1; min-width: 240px;">
+      <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search by client, email, ref..." style="max-width: 300px;">
+    </div>
+
+    <div class="filter-group">
+      <select name="status" class="form-select" onchange="this.form.submit()" style="width: auto;">
+        <option value="ALL" {% if selected_status == 'ALL' %}selected{% endif %}>All Statuses</option>
+        <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>Pending</option>
+        <option value="CONFIRMED" {% if selected_status == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
+        <option value="IN_PROGRESS" {% if selected_status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+        <option value="COMPLETED" {% if selected_status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+        <option value="CANCELLED" {% if selected_status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+        <option value="RESCHEDULED" {% if selected_status == 'RESCHEDULED' %}selected{% endif %}>Rescheduled</option>
+      </select>
+
+      <input type="date" name="date" value="{{ date_filter }}" class="form-control" onchange="this.form.submit()" style="width: auto;">
+
+      <button type="submit" class="btn btn-secondary btn-sm">
+        <span>Filter</span>
+      </button>
+
+      {% if search_query or selected_status != 'ALL' or date_filter %}
+        <a href="{% url 'designer_dashboard' %}" class="btn btn-outline btn-sm">Reset</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Appointments Data Table -->
+  <div class="table-wrapper">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Ref Code</th>
+          <th>Client & Brand</th>
+          <th>Service Package</th>
+          <th>Date & Time</th>
+          <th>Meeting Mode</th>
+          <th>Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appt in appointments %}
+          <tr>
+            <td>
+              <a href="{% url 'booking_detail' appt.booking_reference %}" style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-primary);">
+                {{ appt.booking_reference }}
+              </a>
+            </td>
+            <td>
+              <strong style="display: block;">{{ appt.client_name }}</strong>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">
+                {% if appt.company_or_brand %}{{ appt.company_or_brand }} • {% endif %}{{ appt.client_email }}
+              </span>
+            </td>
+            <td>
+              <div>{{ appt.service.name }}</div>
+              <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted);">{{ appt.service.currency }}{{ appt.service.price }}</span>
+            </td>
+            <td>
+              <div style="font-family: var(--font-mono); font-size: 0.85rem;">{{ appt.appointment_date|date:"M j, Y" }}</div>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">{{ appt.start_time|time:"g:i A" }}</span>
+            </td>
+            <td>
+              <span style="font-size: 0.82rem;">{{ appt.get_meeting_type_display }}</span>
+            </td>
+            <td>
+              <span class="badge {{ appt.status_badge_class }}">{{ appt.get_status_display }}</span>
+            </td>
+            <td style="text-align: right;">
+              <div style="display: inline-flex; gap: 0.35rem;">
+                <button type="button" 
+                        class="btn btn-secondary btn-sm btn-edit-status"
+                        data-ref="{{ appt.booking_reference }}"
+                        data-client="{{ appt.client_name }}"
+                        data-current-status="{{ appt.status }}"
+                        data-notes="{{ appt.designer_notes }}">
+                  <span>Status</span>
+                </button>
+
+                <a href="{% url 'booking_detail' appt.booking_reference %}" class="btn btn-outline btn-sm" title="View Full Details">
+                  <span>View</span>
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.85rem;">
+              No appointments found matching your query criteria.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Status Update Modal -->
+<div class="status-modal" id="status-modal">
+  <div class="status-modal-content">
+    <button type="button" class="lightbox-close-btn" id="status-modal-close" aria-label="Close">&times;</button>
+    <h3 id="status-modal-title" style="font-size: 1.25rem; margin-bottom: 1.25rem;">Update Status</h3>
+
+    <form method="POST" id="status-update-form" action="">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="status-select">Appointment Status</label>
+        <select name="status" id="status-select" class="form-select">
+          <option value="PENDING">Pending Confirmation</option>
+          <option value="CONFIRMED">Confirmed</option>
+          <option value="IN_PROGRESS">In Progress / Designing</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+          <option value="RESCHEDULED">Rescheduled</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.75rem;">
+        <label class="form-label" for="designer-notes-input">Designer Internal Notes</label>
+        <textarea name="designer_notes" id="designer-notes-input" class="form-control" rows="3" placeholder="Add private milestone notes..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        <span>Save Changes</span>
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

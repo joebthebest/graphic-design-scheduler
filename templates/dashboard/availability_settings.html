@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Working Hours & Availability Settings | {{ STUDIO_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 4rem; padding-bottom: 6rem; max-width: 900px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+    <div>
+      <a href="{% url 'designer_dashboard' %}" style="font-size: 0.85rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.5rem;">
+        <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
+        <span>Back to Dashboard</span>
+      </a>
+      <h1 style="font-size: 2.2rem; font-weight: 800;">Working Hours & Availability</h1>
+      <p style="color: var(--text-secondary);">Configure your weekly working schedule, lunch breaks, and days off. The slot engine dynamically adjusts client booking availability based on these settings.</p>
+    </div>
+  </div>
+
+  <div class="glass-card" style="padding: 2.5rem;">
+    <form method="POST">
+      {% csrf_token %}
+
+      <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2.5rem;">
+        {% for schedule in schedules %}
+          <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="font-size: 1.15rem; font-weight: 700;">{{ schedule.get_day_of_week_display }}</h3>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+                <input type="checkbox" name="day_{{ schedule.day_of_week }}_is_off" {% if schedule.is_off %}checked{% endif %}>
+                <span>Mark Day Off (Closed)</span>
+              </label>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+              <div>
+                <label class="form-label" style="font-size: 0.8rem;">Start Time</label>
+                <input type="time" name="day_{{ schedule.day_of_week }}_start" value="{{ schedule.start_time|time:'H:i' }}" class="form-control">
+              </div>
+
+              <div>
+                <label class="form-label" style="font-size: 0.8rem;">End Time</label>
+                <input type="time" name="day_{{ schedule.day_of_week }}_end" value="{{ schedule.end_time|time:'H:i' }}" class="form-control">
+              </div>
+
+              <div>
+                <label class="form-label" style="font-size: 0.8rem;">Lunch Break Start</label>
+                <input type="time" name="day_{{ schedule.day_of_week }}_break_start" value="{{ schedule.break_start|time:'H:i' }}" class="form-control">
+              </div>
+
+              <div>
+                <label class="form-label" style="font-size: 0.8rem;">Lunch Break End</label>
+                <input type="time" name="day_{{ schedule.day_of_week }}_break_end" value="{{ schedule.break_end|time:'H:i' }}" class="form-control">
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+        <a href="{% url 'designer_dashboard' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+          <i data-lucide="save"></i>
+          <span>Save Availability Settings</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

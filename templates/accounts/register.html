@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Client / Team Registration | {{ STUDIO_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 5rem; padding-bottom: 6rem;">
+  <div style="max-width: 480px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--gradient-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+        <i data-lucide="user-plus"></i>
+      </div>
+      <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem;">Create Account</h1>
+      <p style="color: var(--text-secondary); font-size: 0.95rem;">Register for a client or studio team member account.</p>
+    </div>
+
+    <div class="glass-card" style="padding: 2.5rem;">
+      <form method="POST">
+        {% csrf_token %}
+
+        {% for field in form %}
+          <div class="form-group">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+              <span class="form-help">{{ field.help_text }}</span>
+            {% endif %}
+            {% if field.errors %}
+              <div style="color: var(--brand-rose); font-size: 0.8rem; margin-top: 0.25rem;">
+                {{ field.errors }}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 1.5rem;">
+          <i data-lucide="user-check"></i>
+          <span>Create Account</span>
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+        Already have an account? <a href="{% url 'login' %}" style="color: var(--brand-primary); font-weight: 600;">Log In</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

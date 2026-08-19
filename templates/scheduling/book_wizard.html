@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Book Design Consultation — {{ STUDIO_NAME }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/booking.css' %}">
+<style>
+  .booking-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+  .summary-sidebar {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 1.75rem;
+    position: sticky;
+    top: 90px;
+  }
+  @media (max-width: 900px) {
+    .booking-layout {
+      grid-template-columns: 1fr;
+    }
+    .summary-sidebar {
+      position: static;
+      margin-top: 2rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="booking-container">
+  <div style="margin-bottom: 2.5rem;">
+    <span class="section-label">Online Scheduling</span>
+    <h1 style="font-size: 2.4rem; font-weight: 700; margin-bottom: 0.5rem;">Schedule Your Design Session</h1>
+    <p style="color: var(--text-secondary);">Select your project package, pick a live consultation slot, and share your brand brief.</p>
+  </div>
+
+  <!-- Stepper Header -->
+  <div class="stepper-header">
+    <div class="step-item active" data-step="1">
+      <span class="step-number">[ 01 ]</span>
+      <span class="step-title">Select Package</span>
+    </div>
+
+    <div class="step-item" data-step="2">
+      <span class="step-number">[ 02 ]</span>
+      <span class="step-title">Date & Slot</span>
+    </div>
+
+    <div class="step-item" data-step="3">
+      <span class="step-number">[ 03 ]</span>
+      <span class="step-title">Project Brief</span>
+    </div>
+  </div>
+
+  <form method="POST" id="booking-wizard-form">
+    {% csrf_token %}
+
+    <div class="booking-layout">
+      <!-- Main Steps Container -->
+      <div class="wizard-steps-container">
+        
+        <!-- STEP 1: Select Service -->
+        <div class="wizard-step active" id="step-1">
+          <div style="display: none;">
+            {{ form.service }}
+          </div>
+
+          <div class="service-selection-grid">
+            {% for service in services %}
+              <div class="service-select-card {% if selected_service and selected_service.id == service.id %}selected{% endif %}"
+                   data-service-id="{{ service.id }}"
+                   data-service-name="{{ service.name }}"
+                   data-service-price="{{ service.currency }}{{ service.price|floatformat:0|intcomma }}"
+                   data-service-duration="{{ service.duration_minutes }}">
+                
+                <div>
+                  <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-primary); text-transform: uppercase; margin-bottom: 0.35rem;">
+                    {{ service.get_category_display }}
+                  </div>
+                  <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">{{ service.name }}</h3>
+                  <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    {{ service.tagline }}
+                  </p>
+                </div>
+
+                <div>
+                  <div class="service-card-price">{{ service.currency }}{{ service.price|floatformat:0|intcomma }}</div>
+                  <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    {{ service.duration_minutes }}M BRIEFING // {{ service.turnaround_time }}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- STEP 2: Date & Slots -->
+        <div class="wizard-step" id="step-2">
+          <div class="slot-picker-layout">
+            <!-- Date Picker Box -->
+            <div class="date-selector-box">
+              <label class="form-label" for="id_appointment_date">Select Consultation Date</label>
+              {{ form.appointment_date }}
+              <span class="form-help">Studio Hours: Mon–Fri (9:00 AM – 6:00 PM), Sat (10:00 AM – 3:00 PM).</span>
+            </div>
+
+            <!-- Slots Selector Box -->
+            <div class="slots-selector-box">
+              <div style="font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; color: var(--text-primary); font-weight: 700; margin-bottom: 0.75rem;">
+                Available Consultation Slots
+              </div>
+
+              <div style="display: none;">
+                {{ form.start_time }}
+              </div>
+
+              <!-- Loading State -->
+              <div id="slots-loading" style="display: none; padding: 2rem; text-align: center; color: var(--text-muted);">
+                <p style="font-family: var(--font-mono); font-size: 0.85rem;">Calculating live studio availability...</p>
+              </div>
+
+              <!-- Empty State -->
+              <div id="slots-empty" class="no-slots-msg" style="display: none;">
+                <p>No available slots on this date (day off or fully booked). Please select an alternate date.</p>
+              </div>
+
+              <!-- Slots Buckets -->
+              <div id="slots-container">
+                <div id="morning-section" style="display: none;">
+                  <div class="slots-group-header">Morning</div>
+                  <div class="slots-grid" id="morning-slots"></div>
+                </div>
+
+                <div id="afternoon-section" style="display: none;">
+                  <div class="slots-group-header">Afternoon</div>
+                  <div class="slots-grid" id="afternoon-slots"></div>
+                </div>
+
+                <div id="evening-section" style="display: none;">
+                  <div class="slots-group-header">Evening</div>
+                  <div class="slots-grid" id="evening-slots"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Client Brief & Information -->
+        <div class="wizard-step" id="step-3">
+          <div class="clean-card">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+              <div class="form-group">
+                <label class="form-label" for="id_client_name">Your Full Name *</label>
+                {{ form.client_name }}
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="id_client_email">Email Address *</label>
+                {{ form.client_email }}
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+              <div class="form-group">
+                <label class="form-label" for="id_client_phone">Phone / WhatsApp *</label>
+                {{ form.client_phone }}
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="id_company_or_brand">Company / Brand Name</label>
+                {{ form.company_or_brand }}
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+              <div class="form-group">
+                <label class="form-label" for="id_meeting_type">Meeting Format</label>
+                {{ form.meeting_type }}
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="id_target_deadline">Target Project Deadline</label>
+                {{ form.target_deadline }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="id_brand_assets_link">Assets / Moodboard Link (Google Drive, Figma, Pinterest)</label>
+              {{ form.brand_assets_link }}
+              <span class="form-help">Optional: Share existing brand files, logos, or visual references.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="id_design_brief">Design Brief / Project Scope *</label>
+              {{ form.design_brief }}
+              <span class="form-help">Describe your brand style preferences, target audience, deliverables, and vision.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wizard Navigation -->
+        <div class="wizard-footer">
+          <button type="button" class="btn btn-secondary" id="btn-prev" style="display: none;">
+            <span>Back</span>
+          </button>
+
+          <div style="margin-left: auto; display: flex; gap: 1rem;">
+            <button type="button" class="btn btn-primary" id="btn-next">
+              <span>Continue</span>
+              <i data-lucide="arrow-right"></i>
+            </button>
+
+            <button type="submit" class="btn btn-accent" id="btn-submit" style="display: none;">
+              <span>Confirm Booking</span>
+              <i data-lucide="check"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Sidebar -->
+      <div class="summary-sidebar">
+        <div class="mono-tag" style="margin-bottom: 0.75rem;">Summary</div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.25rem;">Package:</span>
+          <strong id="summary-service-name" style="font-size: 1rem; color: var(--text-primary);">
+            {% if selected_service %}{{ selected_service.name }}{% else %}Brand Identity & Logo Suite{% endif %}
+          </strong>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1.25rem;">
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.25rem;">Investment:</span>
+            <span id="summary-service-price" style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">
+              {% if selected_service %}{{ selected_service.currency }}{{ selected_service.price|floatformat:0 }}{% else %}₦150,000{% endif %}
+            </span>
+          </div>
+
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.25rem;">Briefing:</span>
+            <span id="summary-service-duration" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-secondary);">
+              {% if selected_service %}{{ selected_service.duration_minutes }} Min{% else %}60 Min{% endif %}
+            </span>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+
+        <div style="margin-bottom: 1rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.25rem;">Date:</span>
+          <strong id="summary-date" style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary);">-</strong>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.25rem;">Time:</span>
+          <strong id="summary-time" style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--accent-primary);">-</strong>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; font-size: 0.78rem; color: var(--text-muted);">
+          Instant calendar invite (.ics) generated upon confirmation.
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/booking_wizard.js' %}"></script>
+{% endblock %}

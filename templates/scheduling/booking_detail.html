@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking {{ appointment.booking_reference }} — {{ STUDIO_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 4rem; padding-bottom: 6rem; max-width: 960px;">
+  <!-- Top Bar -->
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+    <div>
+      <a href="{% url 'lookup_booking' %}" style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">
+        &larr; BACK TO LOOKUP
+      </a>
+      <h1 style="font-size: 2.2rem; font-weight: 700;">Ref: {{ appointment.booking_reference }}</h1>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <span class="badge {{ appointment.status_badge_class }}">
+        {{ appointment.get_status_display }}
+      </span>
+      <a href="{% url 'download_ics' appointment.booking_reference %}" class="btn btn-outline btn-sm">
+        <span>Download .ICS</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Details Grid -->
+  <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+    <!-- Left Column: Specs & Brief -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div class="clean-card">
+        <span class="section-label">Specifications</span>
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">
+          Consultation & Package Details
+        </h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; font-size: 0.92rem;">
+          <div>
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block;">Package:</span>
+            <strong>{{ appointment.service.name }}</strong>
+          </div>
+
+          <div>
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block;">Price:</span>
+            <strong style="font-family: var(--font-mono);">{{ appointment.service.currency }}{{ appointment.service.price }}</strong>
+          </div>
+
+          <div>
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block;">Date:</span>
+            <strong style="font-family: var(--font-mono);">{{ appointment.appointment_date|date:"l, F j, Y" }}</strong>
+          </div>
+
+          <div>
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block;">Time Slot:</span>
+            <strong style="font-family: var(--font-mono); color: var(--accent-primary);">{{ appointment.start_time|time:"g:i A" }} — {{ appointment.end_time|time:"g:i A" }}</strong>
+          </div>
+
+          <div>
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block;">Meeting Mode:</span>
+            <strong>{{ appointment.get_meeting_type_display }}</strong>
+          </div>
+
+          <div>
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block;">Meeting Link:</span>
+            <a href="{{ appointment.meeting_link }}" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">
+              Join Meeting
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Design Brief & Assets -->
+      <div class="clean-card">
+        <span class="section-label">Client Brief</span>
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">
+          Project Scope & Reference Links
+        </h3>
+
+        {% if appointment.company_or_brand %}
+          <div style="margin-bottom: 1rem;">
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block;">Brand / Company:</span>
+            <strong>{{ appointment.company_or_brand }}</strong>
+          </div>
+        {% endif %}
+
+        {% if appointment.target_deadline %}
+          <div style="margin-bottom: 1rem;">
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block;">Target Deadline:</span>
+            <strong style="font-family: var(--font-mono);">{{ appointment.target_deadline|date:"F j, Y" }}</strong>
+          </div>
+        {% endif %}
+
+        {% if appointment.brand_assets_link %}
+          <div style="margin-bottom: 1.25rem;">
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block;">Moodboard / Assets Link:</span>
+            <a href="{{ appointment.brand_assets_link }}" target="_blank" style="color: var(--accent-primary); text-decoration: underline; word-break: break-all;">
+              {{ appointment.brand_assets_link }}
+            </a>
+          </div>
+        {% endif %}
+
+        <div>
+          <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">Project Scope:</span>
+          <div style="background: var(--bg-surface-elevated); padding: 1rem; border-radius: var(--radius-xs); font-size: 0.88rem; line-height: 1.6; white-space: pre-line;">
+            {{ appointment.design_brief }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Contact & Actions -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div class="clean-card">
+        <span class="section-label">Client Contact</span>
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Information</h3>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.88rem;">
+          <div>
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; display: block;">Name:</span>
+            <strong>{{ appointment.client_name }}</strong>
+          </div>
+          <div>
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; display: block;">Email:</span>
+            <strong>{{ appointment.client_email }}</strong>
+          </div>
+          <div>
+            <span style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; display: block;">Phone / WhatsApp:</span>
+            <strong>{{ appointment.client_phone }}</strong>
+          </div>
+        </div>
+
+        {% if appointment.status != 'CANCELLED' and appointment.status != 'COMPLETED' %}
+          <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
+
+          <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <a href="{% url 'reschedule_booking' appointment.booking_reference %}" class="btn btn-secondary btn-sm" style="width: 100%;">
+              <span>Reschedule Date / Time</span>
+            </a>
+
+            <a href="{% url 'cancel_booking' appointment.booking_reference %}" class="btn btn-danger btn-sm" style="width: 100%;">
+              <span>Cancel Appointment</span>
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Leave Review Form (If Completed) -->
+      {% if appointment.status == 'COMPLETED' %}
+        <div class="clean-card">
+          <span class="section-label">Feedback</span>
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Leave a Client Review</h3>
+
+          <form method="POST" action="{% url 'add_review' appointment.booking_reference %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="form-label">Rating</label>
+              {{ review_form.rating }}
+            </div>
+            <div class="form-group">
+              <label class="form-label">Comment</label>
+              {{ review_form.comment }}
+            </div>
+            <div style="display: none;">
+              {{ review_form.client_name }}
+              {{ review_form.client_role }}
+              {{ review_form.service_name }}
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">
+              <span>Submit Review</span>
+            </button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

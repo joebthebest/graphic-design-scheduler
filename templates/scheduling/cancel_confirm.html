@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cancel Appointment | {{ STUDIO_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 5rem; padding-bottom: 6rem; max-width: 540px;">
+  <div class="glass-card" style="padding: 2.5rem; text-align: center;">
+    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(244, 63, 94, 0.15); color: var(--brand-rose); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 1.5rem;">
+      <i data-lucide="alert-triangle"></i>
+    </div>
+
+    <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.75rem;">Cancel Consultation?</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">
+      Are you sure you want to cancel your scheduled appointment <strong style="color: var(--text-primary);">{{ appointment.booking_reference }}</strong> for <strong>{{ appointment.service.name }}</strong> on <strong>{{ appointment.appointment_date|date:"F j, Y" }}</strong>?
+    </p>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'booking_detail' appointment.booking_reference %}" class="btn btn-secondary" style="flex: 1;">
+          <span>Keep Appointment</span>
+        </a>
+        <button type="submit" class="btn btn-danger" style="flex: 1;">
+          <i data-lucide="x-circle"></i>
+          <span>Yes, Cancel It</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+# Python & Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Database (optional for deployment, but seeded db can be included or regenerated via python manage.py seed_data)
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE configuration
+.vscode/
+.idea/

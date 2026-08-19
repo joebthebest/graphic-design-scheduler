@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Designer & Admin Login — {{ STUDIO_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 5rem; padding-bottom: 6rem;">
+  <div style="max-width: 440px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+      <span class="section-label">Portal Access</span>
+      <h1 style="font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem;">Designer Login</h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem;">
+        Access consultation schedules, client briefs, and studio availability settings.
+      </p>
+    </div>
+
+    <div class="clean-card">
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label" for="id_username">Username</label>
+          <input type="text" name="username" id="id_username" class="form-control" placeholder="admin" required autofocus>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.75rem;">
+          <label class="form-label" for="id_password">Password</label>
+          <input type="password" name="password" id="id_password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <span>Log In to Dashboard</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Academic Demonstration Credentials Card -->
+      <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-xs); font-size: 0.82rem;">
+        <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-primary); text-transform: uppercase; display: block; margin-bottom: 0.35rem;">SEN 310 Demo Credentials:</span>
+        <div style="color: var(--text-secondary); font-family: var(--font-mono);">
+          Username: <strong>admin</strong> | Password: <strong>admin123</strong>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 1.5rem;">
+      <a href="{% url 'home' %}" style="color: var(--text-muted); font-size: 0.85rem;">&larr; Back to Studio Website</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

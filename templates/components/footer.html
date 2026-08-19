@@ -1,0 +1,64 @@
+{% load static %}
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="navbar-brand" style="margin-bottom: 0.75rem;">
+          <span class="brand-dot"></span>
+          <span>{{ STUDIO_NAME }}</span>
+        </div>
+        <p style="max-width: 340px; font-size: 0.88rem; margin-bottom: 1.25rem;">
+          {{ STUDIO_TAGLINE }}. Bespoke visual identities, event posters, and digital campaign collaterals.
+        </p>
+        <span class="badge badge-success">● Available for Bookings</span>
+      </div>
+
+      <div class="footer-column">
+        <h4>Services</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'book_wizard_service' 'brand-identity-logo-suite' %}">Brand Identity</a></li>
+          <li><a href="{% url 'book_wizard_service' 'event-flyer-poster-design' %}">Event & Club Flyers</a></li>
+          <li><a href="{% url 'book_wizard_service' 'social-media-content-pack' %}">Social Media Packs</a></li>
+          <li><a href="{% url 'book_wizard_service' 'infographics-corporate-deck' %}">Infographics & Decks</a></li>
+          <li><a href="{% url 'book_wizard_service' 'design-consultation-visual-audit' %}">Design Audit</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'book_wizard' %}">Book Consultation</a></li>
+          <li><a href="{% url 'lookup_booking' %}">Find My Booking</a></li>
+          <li><a href="{% url 'portfolio' %}">Selected Works</a></li>
+          <li><a href="{% url 'about' %}">Studio Profile</a></li>
+          <li><a href="{% url 'contact' %}">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Contact & Direct Line</h4>
+        <p style="font-size: 0.88rem; margin-bottom: 0.5rem;">
+          <strong>Email:</strong> <a href="mailto:{{ STUDIO_EMAIL }}">{{ STUDIO_EMAIL }}</a>
+        </p>
+        <p style="font-size: 0.88rem; margin-bottom: 0.5rem;">
+          <strong>Direct Line:</strong> {{ STUDIO_PHONE }}
+        </p>
+        <p style="font-size: 0.88rem; margin-bottom: 1.25rem;">
+          <strong>Location:</strong> {{ STUDIO_LOCATION }}
+        </p>
+        <a href="{% url 'book_wizard' %}" class="btn btn-primary btn-sm" style="width: 100%;">
+          <span>Schedule Discovery Call</span>
+          <i data-lucide="arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 {{ STUDIO_NAME }}. SEN 310 Course Project.</p>
+      <div style="display: flex; gap: 1.5rem;">
+        <a href="{% url 'lookup_booking' %}">Manage Booking</a>
+        <a href="{% url 'contact' %}">Support</a>
+      </div>
+    </div>
+  </div>
+</footer>

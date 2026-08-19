@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmed - {{ appointment.booking_reference }} | {{ STUDIO_NAME }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/booking.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+  <div class="success-card">
+    <div class="success-icon-badge">
+      <i data-lucide="check"></i>
+    </div>
+
+    <span class="badge badge-success" style="margin-bottom: 1rem;">Booking Successfully Confirmed</span>
+    <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 0.75rem;">You're All Set, {{ appointment.client_name }}!</h1>
+    <p style="color: var(--text-secondary); max-width: 520px; margin: 0 auto 2rem;">
+      Your design consultation has been locked into the studio calendar. We have prepared your initial brief and look forward to collaborating!
+    </p>
+
+    <!-- Booking Ref Box -->
+    <div class="booking-ref-box">
+      <span style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Your Unique Booking Reference:</span>
+      <div class="booking-ref-code" id="booking-ref-text">{{ appointment.booking_reference }}</div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Save this reference code to manage, reschedule, or check the status of your booking anytime.</p>
+    </div>
+
+    <!-- Details Card -->
+    <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.75rem; text-align: left; margin-bottom: 2rem;">
+      <h3 style="font-size: 1.15rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+        <span>Session Specifications</span>
+        <span class="badge {{ appointment.status_badge_class }}">{{ appointment.get_status_display }}</span>
+      </h3>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Design Package:</span>
+          <strong>{{ appointment.service.name }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Investment:</span>
+          <strong style="color: var(--brand-cyan);">{{ appointment.service.currency }}{{ appointment.service.price }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Scheduled Date:</span>
+          <strong>{{ appointment.appointment_date|date:"l, F j, Y" }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Scheduled Time:</span>
+          <strong>{{ appointment.start_time|time:"g:i A" }} - {{ appointment.end_time|time:"g:i A" }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Meeting Format:</span>
+          <strong>{{ appointment.get_meeting_type_display }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Meeting Link / Studio:</span>
+          <a href="{{ appointment.meeting_link }}" target="_blank" style="color: var(--brand-primary); text-decoration: underline; word-break: break-all;">
+            {{ appointment.meeting_link }}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+      <a href="{% url 'download_ics' appointment.booking_reference %}" class="btn btn-primary btn-lg">
+        <i data-lucide="calendar-arrow-down"></i>
+        <span>Add to Google / Apple Calendar (.ics)</span>
+      </a>
+
+      <a href="{% url 'booking_detail' appointment.booking_reference %}" class="btn btn-secondary btn-lg">
+        <i data-lucide="external-link"></i>
+        <span>View Full Booking Details</span>
+      </a>
+
+      <a href="{% url 'home' %}" class="btn btn-outline btn-lg">
+        <i data-lucide="home"></i>
+        <span>Return to Home</span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

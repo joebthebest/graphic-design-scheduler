@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Design Services & Pricing — {{ STUDIO_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 4rem; padding-bottom: 5rem;">
+  <div style="margin-bottom: 3.5rem;">
+    <span class="section-label">Pricing & Scope</span>
+    <h1 style="font-size: 2.6rem; font-weight: 700; margin-bottom: 0.5rem;">Services & Packages</h1>
+    <p style="color: var(--text-secondary); max-width: 600px;">
+      Transparent pricing and dedicated 1-on-1 design consultation. Select a package to view live calendar availability.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-bottom: 5rem;">
+    {% for service in services %}
+      <div class="clean-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <span class="mono-tag">{{ service.get_category_display }}</span>
+            {% if service.badge_text %}
+              <span class="badge badge-primary">{{ service.badge_text }}</span>
+            {% endif %}
+          </div>
+
+          <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem;">{{ service.name }}</h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.5rem;">
+            {{ service.description }}
+          </p>
+
+          <div style="font-family: var(--font-mono); font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">
+            {{ service.currency }}{{ service.price|floatformat:0|intcomma }}
+          </div>
+
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+            {{ service.duration_minutes }}M CONSULTATION // {{ service.turnaround_time }}
+          </div>
+
+          <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-bottom: 1.5rem;">
+            <span style="font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.75rem;">Deliverables:</span>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.45rem;">
+              {% for item in service.get_deliverables_list %}
+                <li style="font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 0.5rem;">
+                  <span style="color: var(--accent-primary);">—</span>
+                  <span>{{ item }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+
+        <a href="{% url 'book_wizard_service' service.slug %}" class="btn btn-primary" style="width: 100%;">
+          <span>Book Consultation</span>
+          <i data-lucide="arrow-right"></i>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

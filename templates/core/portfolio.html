@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Design Portfolio & Selected Works — {{ STUDIO_NAME }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/portfolio.css' %}?v=2.5">
+<style>
+  .portfolio-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1.5rem !important;
+  }
+  .portfolio-image-wrapper {
+    position: relative !important;
+    aspect-ratio: 3 / 3.8 !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    background: #060709 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.5rem !important;
+  }
+  .portfolio-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transition: transform 0.35s ease !important;
+  }
+  @media (max-width: 1100px) {
+    .portfolio-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 1.25rem !important;
+    }
+  }
+  @media (max-width: 600px) {
+    .portfolio-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1.25rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 4rem; padding-bottom: 5rem;">
+  <div style="margin-bottom: 2.5rem;">
+    <span class="section-label">Archive</span>
+    <h1 style="font-size: 2.6rem; font-weight: 700; margin-bottom: 0.5rem;">Selected Works</h1>
+    <p style="color: var(--text-secondary); max-width: 600px;">
+      Brand identities, event flyers, editorial posters, digital graphics, and data visualizations designed by James Design Studio.
+    </p>
+  </div>
+
+  <!-- Filters -->
+  <div class="portfolio-filters">
+    <button type="button" class="filter-btn active" data-filter="all">All Works ({{ portfolio_items.count }})</button>
+    <button type="button" class="filter-btn" data-filter="branding">Brand Identity</button>
+    <button type="button" class="filter-btn" data-filter="flyers">Flyers & Posters</button>
+    <button type="button" class="filter-btn" data-filter="infographics">Infographics</button>
+    <button type="button" class="filter-btn" data-filter="social">Social Media</button>
+  </div>
+
+  <!-- Portfolio Grid -->
+  <div class="portfolio-grid" id="portfolio-grid" style="margin-bottom: 4rem;">
+    {% for item in portfolio_items %}
+      <div class="portfolio-card" 
+           data-category="{{ item.category }}"
+           data-img="{{ item.image_url }}"
+           data-title="{{ item.title }}"
+           data-category-display="{{ item.get_category_display }}"
+           data-client="{{ item.client_name }}"
+           data-desc="{{ item.description }}"
+           data-tools="{{ item.tools_used }}"
+           data-service-slug="{% if item.related_service %}{{ item.related_service.slug }}{% endif %}">
+        
+        <div class="portfolio-image-wrapper">
+          <img src="{{ item.image_url }}" alt="{{ item.title }}" class="portfolio-image" loading="lazy">
+        </div>
+
+        <div class="portfolio-info">
+          <div class="portfolio-meta">
+            <span>{{ item.get_category_display }}</span>
+          </div>
+          <h4>{{ item.title }}</h4>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div class="lightbox-modal" id="lightbox-modal">
+  <div class="lightbox-content">
+    <button type="button" class="lightbox-close-btn" id="lightbox-close" aria-label="Close">&times;</button>
+    <div class="lightbox-image-side">
+      <img src="" id="lightbox-img" alt="Artwork Preview">
+    </div>
+    <div class="lightbox-info-side">
+      <div>
+        <div class="mono-tag" id="lightbox-category" style="margin-bottom: 0.5rem;">Category</div>
+        <h3 id="lightbox-title" style="font-size: 1.5rem; margin-bottom: 0.75rem;">Project Title</h3>
+        <p id="lightbox-desc" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem; font-size: 0.92rem;">Description</p>
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-bottom: 1.5rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.25rem;">Software:</span>
+          <span id="lightbox-tools" style="font-size: 0.88rem; color: var(--text-primary);">Adobe Photoshop, Illustrator</span>
+        </div>
+      </div>
+      <div>
+        <a href="{% url 'book_wizard' %}" id="lightbox-book-btn" class="btn btn-primary" style="width: 100%;">
+          <span>Schedule Project Discovery</span>
+          <i data-lucide="arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/portfolio.js' %}"></script>
+{% endblock %}

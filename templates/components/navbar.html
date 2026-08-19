@@ -1,0 +1,40 @@
+{% load static %}
+<header class="navbar">
+  <div class="container navbar-container">
+    <a href="{% url 'home' %}" class="navbar-brand">
+      <span class="brand-dot"></span>
+      <span>{{ STUDIO_NAME }}</span>
+    </a>
+
+    <nav class="navbar-menu" id="navbar-menu">
+      <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+      <a href="{% url 'portfolio' %}" class="nav-link {% if request.resolver_match.url_name == 'portfolio' %}active{% endif %}">Works</a>
+      <a href="{% url 'services' %}" class="nav-link {% if request.resolver_match.url_name == 'services' %}active{% endif %}">Services</a>
+      <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+      <a href="{% url 'contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
+      <a href="{% url 'lookup_booking' %}" class="nav-link {% if request.resolver_match.url_name == 'lookup_booking' %}active{% endif %}">Find Booking</a>
+    </nav>
+
+    <div class="navbar-actions">
+      <!-- Dark/Light Mode Switcher -->
+      <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme">
+        <i data-lucide="sun"></i>
+      </button>
+
+      {% if user.is_authenticated %}
+        <a href="{% url 'designer_dashboard' %}" class="btn btn-secondary btn-sm">
+          <span>Dashboard</span>
+        </a>
+        <a href="{% url 'logout' %}" class="btn btn-outline btn-sm">Logout</a>
+      {% else %}
+        <a href="{% url 'book_wizard' %}" class="btn btn-primary btn-sm">
+          <span>Book Session</span>
+        </a>
+      {% endif %}
+
+      <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <i data-lucide="menu"></i>
+      </button>
+    </div>
+  </div>
+</header>

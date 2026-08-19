@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reschedule Consultation | {{ STUDIO_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 4.5rem; padding-bottom: 6rem; max-width: 600px;">
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <span class="badge badge-warning" style="margin-bottom: 0.75rem;">Reschedule Appointment</span>
+    <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem;">Pick a New Date & Time</h1>
+    <p style="color: var(--text-secondary);">
+      Rescheduling booking <strong style="color: var(--text-primary);">{{ appointment.booking_reference }}</strong> for {{ appointment.service.name }}.
+    </p>
+  </div>
+
+  <div class="glass-card" style="padding: 2.5rem;">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="id_reschedule_date">New Date</label>
+        {{ form.appointment_date }}
+      </div>
+
+      <div class="form-group" style="margin-bottom: 2rem;">
+        <label class="form-label" for="id_reschedule_time">New Start Time</label>
+        {{ form.start_time }}
+        <span class="form-help">Consultation hours are Mon-Fri (9am-6pm) and Sat (10am-3pm).</span>
+      </div>
+
+      <div style="display: flex; gap: 1rem;">
+        <a href="{% url 'booking_detail' appointment.booking_reference %}" class="btn btn-secondary" style="flex: 1;">
+          <span>Cancel</span>
+        </a>
+        <button type="submit" class="btn btn-primary" style="flex: 2;">
+          <i data-lucide="check"></i>
+          <span>Save New Slot</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
