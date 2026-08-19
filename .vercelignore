@@ -1,0 +1,10 @@
+# Vercel deployment exclusions (Keeps serverless lambda tiny)
+staticfiles/
+.git
+.github
+*.md
+tests.py
+**/tests.py
+*.log
+.DS_Store
+Thumbs.db
