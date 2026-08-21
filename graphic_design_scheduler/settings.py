@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
+import shutil
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -87,12 +89,30 @@ WSGI_APPLICATION = 'graphic_design_scheduler.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+IS_VERCEL = os.environ.get('VERCEL') == '1' or 'VERCEL' in os.environ or os.path.exists('/var/task')
+
+if IS_VERCEL:
+    tmp_db = Path('/tmp/db.sqlite3')
+    bundled_db = BASE_DIR / 'db.sqlite3'
+    if not tmp_db.exists() and bundled_db.exists():
+        try:
+            shutil.copy(bundled_db, tmp_db)
+        except Exception as e:
+            print(f"Error copying SQLite database to /tmp: {e}")
+    
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': str(tmp_db if tmp_db.exists() else '/tmp/db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
