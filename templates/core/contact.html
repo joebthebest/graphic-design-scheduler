@@ -55,28 +55,35 @@
       <form method="POST">
         {% csrf_token %}
         <div class="form-group">
-          <label class="form-label" for="contact-name">Your Name</label>
+          <label class="form-label" for="contact-name">Your Full Name *</label>
           <input type="text" id="contact-name" name="name" class="form-control" placeholder="e.g. Sarah Jenkins" required>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="contact-email">Email Address</label>
-          <input type="email" id="contact-email" name="email" class="form-control" placeholder="e.g. sarah@company.com" required>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="contact-email">Email Address *</label>
+            <input type="email" id="contact-email" name="email" class="form-control" placeholder="e.g. sarah@company.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="contact-phone">Phone / WhatsApp</label>
+            <input type="text" id="contact-phone" name="phone" class="form-control" placeholder="e.g. +234 800 000 0000">
+          </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="contact-subject">Project / Subject</label>
+          <label class="form-label" for="contact-subject">Project / Subject *</label>
           <input type="text" id="contact-subject" name="subject" class="form-control" placeholder="e.g. Brand Identity Inquiry" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="contact-message">Message</label>
-          <textarea id="contact-message" name="message" class="form-control" rows="4" placeholder="Tell us about your timeline, ideas, or questions..." required></textarea>
+          <label class="form-label" for="contact-message">Design Brief / Message *</label>
+          <textarea id="contact-message" name="message" class="form-control" rows="4" placeholder="Tell us about your timeline, ideas, or project requirements..." required></textarea>
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%;">
-          <i data-lucide="send"></i>
-          <span>Send Message</span>
+          <span>Send Inquiry Message</span>
+          <i data-lucide="arrow-right"></i>
         </button>
       </form>
     </div>

@@ -64,8 +64,12 @@ def designer_dashboard_view(request):
         status__in=['CONFIRMED', 'IN_PROGRESS', 'COMPLETED']
     ).aggregate(total=Sum('service__price'))['total'] or 0
 
+    from apps.core.models import ContactInquiry
+
     working_hours = WorkingHours.objects.all().order_by('day_of_week')
     services = Service.objects.all()
+    unread_inquiries_count = ContactInquiry.objects.filter(is_read=False).count()
+    recent_inquiries = ContactInquiry.objects.all().order_by('-created_at')[:5]
 
     context = {
         'appointments': appointments,
@@ -80,6 +84,8 @@ def designer_dashboard_view(request):
         'confirmed_revenue': confirmed_revenue,
         'working_hours': working_hours,
         'services': services,
+        'unread_inquiries_count': unread_inquiries_count,
+        'recent_inquiries': recent_inquiries,
         'selected_status': status_filter,
         'search_query': search_query,
         'date_filter': date_filter,

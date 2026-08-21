@@ -75,17 +75,32 @@ def about_view(request):
     return render(request, 'core/about.html', context)
 
 
+from .models import ContactInquiry
+
+
 def contact_view(request):
     """
     Studio contact and general design inquiry page.
     """
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        subject = request.POST.get('subject')
-        message = request.POST.get('message')
-        # In production this would send email/store inquiry
-        messages.success(request, f"Thank you {name}! Your message has been sent to James Design Studio. We will reply to {email} within 24 hours.")
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        subject = request.POST.get('subject', '').strip()
+        message = request.POST.get('message', '').strip()
+
+        if name and email and message:
+            inquiry = ContactInquiry.objects.create(
+                name=name,
+                email=email,
+                phone=phone,
+                subject=subject or 'General Design Inquiry',
+                message=message
+            )
+            messages.success(request, f"🎉 Thank you {name}! Your inquiry has been received. James Design Studio will reply to {email} shortly.")
+        else:
+            messages.error(request, "Please fill in all required fields (Name, Email, Message).")
+
         return redirect('contact')
 
     return render(request, 'core/contact.html')
